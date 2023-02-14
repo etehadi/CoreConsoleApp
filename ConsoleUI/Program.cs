@@ -6,6 +6,7 @@ using Serilog.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using ConsoleUI.Services;
 using ConsoleUI.Extensions;
+using ConsoleUI.Commands;
 
 namespace ConsoleUI
 {
@@ -34,7 +35,7 @@ namespace ConsoleUI
                 .Build();
 
 
-            ActivatorUtilities.CreateInstance<SampleService>(host.Services).Run().Wait();
+           ActivatorUtilities.CreateInstance<SampleCommand>(host.Services).ParseCommand(args).Wait();
         }
 
 
