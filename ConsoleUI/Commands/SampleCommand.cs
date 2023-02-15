@@ -26,7 +26,7 @@ namespace ConsoleUI.Commands
             {
                 parserResult = await Parser.Default
                     .ParseArguments<SampleCommandOption>(args)
-                    .WithParsedAsync(async p => await _sampleServie.Run());
+                    .WithParsedAsync(async p => await _sampleServie.Run(0));
 
                 parserResult = await parserResult.WithNotParsedAsync(HandleParseError);
 

@@ -20,15 +20,15 @@ namespace ConsoleUI.Services
             _config = config.Value;
         }
 
-        public async Task Run()
+        public async Task<int> Run(int input)
         {
             await Task.Run(() =>
             {
                 for (int i = 0; i < _config.RunCount; i++)
-                {
                     _log.LogInformation("Number is {@Number}", i);
-                }
             });
+
+            return input;
         }
     }
 }

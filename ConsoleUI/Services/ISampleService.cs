@@ -2,6 +2,6 @@
 {
     public interface ISampleService
     {
-        Task Run();
+        Task<int> Run(int input);
     }
 }

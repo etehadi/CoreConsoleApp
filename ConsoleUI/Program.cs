@@ -10,42 +10,46 @@ using ConsoleUI.Commands;
 
 namespace ConsoleUI
 {
-    internal static class Program
+    public static class Program
     {
-        static void Main(string[] args)
+        public static void Main(string[] args)
         {
-            var configBuilder = new ConfigurationBuilder().BuildConfig();
+            ConfigLog();
+            Log.Logger.Information("Application Starging...");
+
+
+            var host = CreateHostBuilder(args).Build();
+            ActivatorUtilities.CreateInstance<SampleCommand>(host.Services)
+                .ParseCommand(args).Wait();
+
+
+            Log.Logger.Information("Application Ended.");
+        }
+
+        private static void ConfigLog()
+        {
+            var configBuilder = new ConfigurationBuilder()
+                .SetBasePath(Directory.GetCurrentDirectory())
+                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
+                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
+                .AddEnvironmentVariables();
 
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configBuilder.Build())
                 .Enrich.FromLogContext()
                 .WriteTo.Console()
                 .CreateLogger();
+        }
 
-            Log.Logger.Information("Application Starging");
-
-
-            var host = Host.CreateDefaultBuilder()
+        public static IHostBuilder CreateHostBuilder(string[] args) =>
+            Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
-                {                    
+                {
                     services.AddTransient<ISampleService, SampleService>();
                     services.ConfigureByName<SampleServiceConfig>(context.Configuration);
                 })
-                .UseSerilog()
-                .Build();
+                .UseSerilog();
 
-
-           ActivatorUtilities.CreateInstance<SampleCommand>(host.Services).ParseCommand(args).Wait();
-        }
-
-
-
-        static IConfigurationBuilder BuildConfig(this IConfigurationBuilder builder)
-        {
-            return builder.SetBasePath(Directory.GetCurrentDirectory())
-                .AddJsonFile("appsettings.json", optional: false, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? "Production"}.json", optional: true)
-                .AddEnvironmentVariables();
-        }
+ 
     }
 }
